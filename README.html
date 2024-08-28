@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prices For Daraz & Website</title>
+    <!-- Import Roboto fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Roboto', 'Roboto Condensed', 'Roboto Slab', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            animation: fadeIn 1s ease-out;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Motion blur effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            animation: slideIn 1s ease-out;
+        }
+
+        th, td {
+            padding: 15px;
+            border: 1px solid #ec407a;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        th {
+            background-color: #ec407a;
+            color: white;
+            font-weight: 700;
+            animation: fadeIn 1s ease-out;
+        }
+
+        td {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+        }
+
+        td input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ec407a;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        td input:focus {
+            background-color: #fce4ec;
+            box-shadow: 0 0 8px rgba(236, 64, 122, 0.5);
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ec407a;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin: 5px;
+            font-weight: 700;
+        }
+
+        button:hover {
+            background-color: #d81b60;
+            transform: scale(1.05);
+        }
+
+        #copy-result {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #333;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
+    <script>
+        function adjustValues() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            rows.forEach(row => {
+                const darazPriceCell = row.querySelector('.daraz-price-cell input');
+                const websitePriceCell = row.querySelector('.website-price-cell input');
+                const priceForDarazCell = row.querySelector('.price-for-daraz-cell');
+                const priceForWebsiteCell = row.querySelector('.price-for-website-cell');
+                const productCell = row.querySelector('.product-cell input');
+
+                if (darazPriceCell && websitePriceCell && priceForDarazCell && priceForWebsiteCell && productCell) {
+                    const darazPrice = parseFloat(darazPriceCell.value);
+                    const websitePrice = parseFloat(websitePriceCell.value);
+                    const productName = productCell.value.trim();
+
+                    if (isNaN(darazPrice) && isNaN(websitePrice)) {
+                        priceForDarazCell.textContent = "";
+                        priceForWebsiteCell.textContent = "";
+                        return;
+                    }
+
+                    let priceForDaraz = isNaN(darazPrice) ? "" : Math.round(darazPrice * 1.10);
+                    priceForDarazCell.textContent = priceForDaraz;
+                    priceForWebsiteCell.textContent = isNaN(websitePrice) ? "" : websitePrice;
+                }
+            });
+        }
+
+        function addRow() {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="product-cell"><input type="text" placeholder="Product name"></td>
+                <td class="daraz-price-cell"><input type="number" step="any" placeholder="Input Daraz Price"></td>
+                <td class="website-price-cell"><input type="number" step="any" placeholder="Input Website Price"></td>
+                <td class="price-for-daraz-cell"></td>
+                <td class="price-for-website-cell"></td>
+            `;
+            document.querySelector('#valuesTable tbody').appendChild(newRow);
+            newRow.style.opacity = 0;
+            newRow.style.animation = 'fadeIn 1s ease-out forwards';
+
+            const inputs = newRow.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', checkLastRow);
+            });
+        }
+
+        function checkLastRow() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            const lastRow = rows[rows.length - 1];
+            const lastDarazPrice = lastRow.querySelector('.daraz-price-cell input');
+            const lastWebsitePrice = lastRow.querySelector('.website-price-cell input');
+            const lastProduct = lastRow.querySelector('.product-cell input');
+
+            if (lastDarazPrice && lastWebsitePrice && lastProduct &&
+                lastDarazPrice.value !== "" &&
+                lastWebsitePrice.value !== "" &&
+                lastProduct.value.trim() !== "") {
+                addRow();
+            }
+        }
+
+        function copyAdjustedValues() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            const adjustedValues = Array.from(rows)
+                .map(row => {
+                    const productCell = row.querySelector('.product-cell input');
+                    const priceForDarazCell = row.querySelector('.price-for-daraz-cell');
+                    const priceForWebsiteCell = row.querySelector('.price-for-website-cell');
+                    const productName = productCell ? productCell.value.trim() : '';
+                    const priceForDaraz = priceForDarazCell ? priceForDarazCell.textContent.trim() : '';
+                    const priceForWebsite = priceForWebsiteCell ? priceForWebsiteCell.textContent.trim() : '';
+
+                    if (productName && (priceForDaraz || priceForWebsite)) {
+                        return `${productName} ${priceForDaraz || "N/A"} ${priceForWebsite || "N/A"}`;
+                    }
+                    return null;
+                })
+                .filter(text => text !== null);
+
+            if (adjustedValues.length === 0) {
+                alert("No values to copy.");
+                return;
+            }
+
+            const formattedText = adjustedValues.join('\n');
+            try {
+                navigator.clipboard.writeText(formattedText);
+                document.getElementById('copy-result').innerText = "New prices copied to clipboard!";
+            } catch (err) {
+                document.getElementById('copy-result').innerText = "Failed to copy prices.";
+            }
+        }
+
+        async function pasteProductNames() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const productNames = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
+
+                productNames.forEach(name => {
+                    addRow();
+                    const rows = document.querySelectorAll('#valuesTable tbody tr');
+                    const lastRow = rows[rows.length - 1];
+                    const productCell = lastRow.querySelector('.product-cell input');
+                    if (productCell) {
+                        productCell.value = name;
+                    }
+                });
+            } catch (err) {
+                alert("Failed to paste product names.");
+            }
+        }
+
+        async function copyProductNames() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            const productNames = Array.from(rows)
+                .map(row => {
+                    const productCell = row.querySelector('.product-cell input');
+                    return productCell ? productCell.value.trim() : '';
+                })
+                .filter(name => name !== '');
+
+            if (productNames.length === 0) {
+                alert("No product names to copy.");
+                return;
+            }
+
+            const formattedText = productNames.join('\n');
+            try {
+                await navigator.clipboard.writeText(formattedText);
+                document.getElementById('copy-result').innerText = "Product names copied to clipboard!";
+            } catch (err) {
+                document.getElementById('copy-result').innerText = "Failed to copy product names.";
+            }
+        }
+
+        async function copyDarazPrices() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            const darazPrices = Array.from(rows)
+                .map(row => {
+                    const darazPriceCell = row.querySelector('.daraz-price-cell input');
+                    return darazPriceCell ? darazPriceCell.value.trim() : '';
+                })
+                .filter(price => price !== '');
+
+            if (darazPrices.length === 0) {
+                alert("No Daraz prices to copy.");
+                return;
+            }
+
+            const formattedText = darazPrices.join('\n');
+            try {
+                await navigator.clipboard.writeText(formattedText);
+                document.getElementById('copy-result').innerText = "Daraz prices copied to clipboard!";
+            } catch (err) {
+                document.getElementById('copy-result').innerText = "Failed to copy Daraz prices.";
+            }
+        }
+
+        async function copyWebsitePrices() {
+            const rows = document.querySelectorAll('#valuesTable tbody tr');
+            const websitePrices = Array.from(rows)
+                .map(row => {
+                    const websitePriceCell = row.querySelector('.website-price-cell input');
+                    return websitePriceCell ? websitePriceCell.value.trim() : '';
+                })
+                .filter(price => price !== '');
+
+            if (websitePrices.length === 0) {
+                alert("No website prices to copy.");
+                return;
+            }
+
+            const formattedText = websitePrices.join('\n');
+            try {
+                await navigator.clipboard.writeText(formattedText);
+                document.getElementById('copy-result').innerText = "Website prices copied to clipboard!";
+            } catch (err) {
+                document.getElementById('copy-result').innerText = "Failed to copy website prices.";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialRow = document.createElement('tr');
+            initialRow.innerHTML = `
+                <td class="product-cell"><input type="text" placeholder="Product name"></td>
+                <td class="daraz-price-cell"><input type="number" step="any" placeholder="Input Daraz Price"></td>
+                <td class="website-price-cell"><input type="number" step="any" placeholder="Input Website Price"></td>
+                <td class="price-for-daraz-cell"></td>
+                <td class="price-for-website-cell"></td>
+            `;
+            document.querySelector('#valuesTable tbody').appendChild(initialRow);
+
+            initialRow.querySelector('.daraz-price-cell input').addEventListener('input', checkLastRow);
+            initialRow.querySelector('.website-price-cell input').addEventListener('input', checkLastRow);
+            initialRow.querySelector('.product-cell input').addEventListener('input', checkLastRow);
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Prices For Daraz & Website</h1>
+    <table id="valuesTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Daraz Price</th>
+                <th>Website Price</th>
+                <th>Price For Daraz</th>
+                <th>Price For Website</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="product-cell"><input type="text" placeholder="Product name"></td>
+                <td class="daraz-price-cell"><input type="number" step="any" placeholder="Input Daraz Price"></td>
+                <td class="website-price-cell"><input type="number" step="any" placeholder="Input Website Price"></td>
+                <td class="price-for-daraz-cell"></td>
+                <td class="price-for-website-cell"></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="button-container">
+        <div class="button-row">
+            <button onclick="adjustValues()">Adjust Prices</button>
+            <button onclick="copyAdjustedValues()">Copy Adjusted Prices</button>
+            <button onclick="pasteProductNames()">Paste Product Names</button>
+        </div>
+        <div class="button-row">
+            <button onclick="copyProductNames()">Copy Only Product Names</button>
+            <button onclick="copyDarazPrices()">Copy Only Daraz Prices</button>
+            <button onclick="copyWebsitePrices()">Copy Only Website Prices</button>
+        </div>
+    </div>
+
+    <div id="copy-result"></div>
+</body>
+
+</html>
